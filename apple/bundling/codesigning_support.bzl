@@ -138,8 +138,11 @@ def _codesign_command(ctx, path_to_sign, entitlements_file):
     if entitlements_file:
       entitlements_flag = (
           "--entitlements %s" % bash_quote(entitlements_file.path))
+    else:
+      entitlements_flag = "--preserve-metadata=identifier,entitlements,flag"
 
     return (cmd_prefix + "/usr/bin/codesign --force " +
+            "--timestamp=none " +
             "--sign $VERIFIED_ID %s %s" % (entitlements_flag, path))
   else:
     # Use ad hoc signing for simulator builds.
@@ -220,8 +223,13 @@ def _signing_command_lines(ctx,
         _verify_signing_id_commands(ctx, identity, provisioning_profile))
 
   for path_to_sign in paths_to_sign:
-    commands.append(_codesign_command(ctx, path_to_sign, entitlements_file))
+    print("Attempting to set up Signing for %s" % path_to_sign)
+    if "Frameworks/*" in path_to_sign.path:
+      commands.append(_codesign_command(ctx, path_to_sign, None))
+    else:
+      commands.append(_codesign_command(ctx, path_to_sign, entitlements_file))
 
+  print("\n".join(commands))
   return "\n".join(commands)
 
 
