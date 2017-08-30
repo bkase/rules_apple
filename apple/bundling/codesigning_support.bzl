@@ -142,7 +142,7 @@ def _codesign_command(ctx, path_to_sign, entitlements_file):
       entitlements_flag = "--preserve-metadata=identifier,entitlements,flag"
 
     return (cmd_prefix + "/usr/bin/codesign --force " +
-            "--timestamp=none" +
+            "--timestamp=none " +
             "--sign $VERIFIED_ID %s %s" % (entitlements_flag, path))
   else:
     # Use ad hoc signing for simulator builds.
