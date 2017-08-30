@@ -224,7 +224,7 @@ def _signing_command_lines(ctx,
 
   for path_to_sign in paths_to_sign:
     print("Attempting to set up Signing for %s" % path_to_sign)
-    if path_to_sign.path.endswith("framework"):
+    if "Framework/*" in path_to_sign.path:
       commands.append(_codesign_command(ctx, path_to_sign, None))
     else:
       commands.append(_codesign_command(ctx, path_to_sign, entitlements_file))
