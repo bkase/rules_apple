@@ -134,16 +134,18 @@ def _codesign_command(ctx, path_to_sign, entitlements_file):
   # $WORK_DIR, which is the variable in that script that contains the path
   # to the directory where the bundle is being built.
   if platform_support.is_device_build(ctx):
-    entitlements_flag = ""
+    entitlement_flag = ""
     if entitlements_file:
       entitlements_flag = (
           "--entitlements %s" % bash_quote(entitlements_file.path))
-    else:
-      entitlements_flag = "--preserve-metadata=identifier,entitlements,flag"
 
-    return (cmd_prefix + "/usr/bin/codesign --force " +
+    # If the entitlements 
+    entitlements_flag_var = 'ENTITLEMENTS_FLAG=$(codesign -d --entitlements :- %s &> /dev/null && echo %s || echo "%s") ' % (path, entitlements_flag, "--preserve-metadata=identifier,entitlements,flag")
+
+    return (entitlement_flag_var + cmd_prefix +
+            "/usr/bin/codesign --force " +
             "--timestamp=none " +
-            "--sign $VERIFIED_ID %s %s" % (entitlements_flag, path))
+            "--sign $VERIFIED_ID $ENTITLEMENTS_FLAG %s" % (entitlements_flag, path))
   else:
     # Use ad hoc signing for simulator builds.
     return cmd_prefix + '/usr/bin/codesign --force --sign "-" %s' % path
@@ -223,13 +225,11 @@ def _signing_command_lines(ctx,
         _verify_signing_id_commands(ctx, identity, provisioning_profile))
 
   for path_to_sign in paths_to_sign:
-    print("Attempting to set up Signing for %s" % path_to_sign)
     if "Frameworks/*" in path_to_sign.path:
       commands.append(_codesign_command(ctx, path_to_sign, None))
     else:
       commands.append(_codesign_command(ctx, path_to_sign, entitlements_file))
 
-  print("\n".join(commands))
   return "\n".join(commands)
 
 
