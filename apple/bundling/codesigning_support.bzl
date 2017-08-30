@@ -140,7 +140,6 @@ def _codesign_command(ctx, path_to_sign, entitlements_file):
           "--entitlements %s" % bash_quote(entitlements_file.path))
 
     return (cmd_prefix + "/usr/bin/codesign --force " +
-            "--preserve-metadata=identifier,entitlements,flags " +
             "--sign $VERIFIED_ID %s %s" % (entitlements_flag, path))
   else:
     # Use ad hoc signing for simulator builds.
@@ -223,6 +222,7 @@ def _signing_command_lines(ctx,
   for path_to_sign in paths_to_sign:
     commands.append(_codesign_command(ctx, path_to_sign, entitlements_file))
 
+  print("\n".join(commands))
   return "\n".join(commands)
 
 
