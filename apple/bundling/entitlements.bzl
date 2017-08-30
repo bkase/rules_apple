@@ -93,7 +93,7 @@ def _extract_team_prefix_action(ctx):
            "trap \"rm ${PLIST}\" EXIT && " +
            extract_plist_cmd + " > ${PLIST} && " +
            "/usr/libexec/PlistBuddy -c " +
-           "'Print TeamIdentifier:0' " +
+           "'Print ApplicationIdentifierPrefix:0' " +
            "${PLIST} > " + bash_quote(team_prefix_file.path)),
       ],
       mnemonic = "ExtractAppleTeamPrefix",
